@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { useScroll, useTransform, motion, useAnimation } from "framer-motion";
 import Spline from "@splinetool/react-spline";
+import { useSpring } from "framer-motion"
 import gsap from "gsap";
+import EarthCanvas from ".";
 const animationOrder = {
   initial: 0,
   fadeinPrimeiraSessao: 100 / 750, // Inicia um pouco antes da primeira sessão
@@ -39,6 +41,7 @@ const animationOrder1 = {
 
 export default function Home() {
   const targetRef = useRef<HTMLDivElement | null>(null);
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start end", "end end"],
@@ -82,7 +85,7 @@ export default function Home() {
       animationOrder1.chega5,
       animationOrder1.mantem5,
     ],
-    [0, 1, 1, 1.2, 1, 1, 1.2, 1, 1, 1.2, 1, 1, 1.2, 1, 1],
+    [1, 1, 1, 1.2, 1, 1, 1.2, 1, 1, 1.2, 1, 1, 1.2, 1, 1],
   );
   const x = useTransform(
     scrollYProgress,
@@ -96,9 +99,63 @@ export default function Home() {
       animationOrder1.cresce2,
       animationOrder1.chega3,
     ],
-    ["-50%", "0%", "0%", "0%", "0%", "0%", "100%", "200%"],
+    ["0%", "0%", "0%", "0%", "0%", "0%", "100%", "200%"],
   );
 
+  const rotate = useTransform(
+    scrollYProgress,
+    [animationOrder1.cresce, animationOrder1.chega2],
+    [2.6, 8.8]
+  );
+  const spring = useSpring(x)
+
+  const [rotationY, setRotationY] = useState(2.6);
+  const controls = useAnimation();
+  const [imagemSelecionada, setImagemSelecionada] = useState('image1');
+const calculateRotation = (scrollValue, image) => {
+  const segments = [
+    { start: animationOrder1.mantem1, end: animationOrder1.chega2, image: "image2" },
+    { start: animationOrder1.mantem2, end: animationOrder1.chega3, image: "image3" },
+    { start: animationOrder1.mantem3, end: animationOrder1.cresce3, image: "image4" },
+    { start: animationOrder1.cresce4, end: animationOrder1.chega5, image: "image5" },
+  ];
+
+  // Verifica se o scrollValue está antes do primeiro segmento
+  if (scrollValue < segments[0].start) {
+    setImagemSelecionada("image1");
+    return rotationY; // Retorna o valor atual
+  }
+
+  for (let i = 0; i < segments.length; i++) {
+    const { start, end } = segments[i];
+    if (scrollValue >= start && scrollValue <= end) {
+      const progress = (scrollValue - start) / (end - start);
+      console.log("segmentIndex", i, ": Progresso:", progress);
+      setImagemSelecionada(segments[i].image); // Define a imagem com base no segmento
+      return 2.6 + progress * (8.8 - 2.6);
+    }
+  }
+
+  return rotationY; // Retorna o valor atual
+};
+  useEffect(() => {
+    const updateRotation = (value) => {
+      const targetRotation = calculateRotation(value);
+      setRotationY(targetRotation);
+
+      controls.start({ rotateY: targetRotation, transition: { type: "tween", duration: 0.5 } });
+    };
+
+    const unsubscribe = scrollYProgress.onChange(updateRotation);
+
+    return () => unsubscribe();
+  }, [controls, scrollYProgress]);
+
+
+  const mudarImagem = (novaImagem) => {
+      setImagemSelecionada(novaImagem);
+      console.log(novaImagem);
+  };
   return (
     <>
       <section className=" header h-screen w-screen  overflow-clip bg-[#607559]">
@@ -131,21 +188,28 @@ export default function Home() {
 
       <main>
         <motion.div
-          className="sticky top-[20%] z-50 h-[70vh] w-[16rem] items-center justify-center bg-black"
-          style={{ scale, x }}
+          className="sticky top-[20%] flex justify-start  items-start z-[60] h-[70vh] w-[20rem] pl-10 pr-5"
+          style={{ x }}
         >
-          <Spline scene="https://prod.spline.design/2ENYClYASKRkes56/scene.splinecode" />
+          <div className="h-[70vh] w-[16rem]">
+          <EarthCanvas rotationY={rotationY} imagem={imagemSelecionada}/>
+          {/* <button className=" bg-white ml-2" onClick={()=> mudarImagem("image1")}>1</button>
+          <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image2")}>2</button>
+          <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image3")}>3</button>
+          <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image4")}>4</button>
+          <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image5")}>5</button> */}
+          </div>
         </motion.div>
         <div ref={targetRef} className="">
-          <section className=" section1 bg-background relative -mt-[70vh] h-[150vh] w-screen overflow-clip">
+          <section className=" sticky top-0 section1 bg-background z-10 -mt-[70vh] h-[150vh] w-screen overflow-clip">
             <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center">
-              {/* <div className="objet1 ml-[10%] h-20 w-20 rounded-lg bg-black"></div>
+              {/* <div clas
               <button
                 className="ml-[30%] h-[100px] w-[100px]  bg-red-500"
                 onClick={() => setShouldAnimate(!shouldAnimate)}
               /> */}
               <div className="flex h-full w-1/3 items-center justify-center">
-                <div className="objet1 h-20 w-20 rounded-lg bg-black"></div>
+                
               </div>
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">Ver o soja</text>
@@ -192,10 +256,10 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section className="section2 bg-background  relative h-[150vh] w-screen overflow-clip">
+          <section className="section2 top-0 bg-background  sticky z-20 h-[150vh] w-screen overflow-clip">
             <div className="bg-secondary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center">
               <div className="flex h-full w-1/3 items-center justify-center">
-                <div className="objet2 h-20 w-20 rounded-lg bg-black"></div>
+                
               </div>
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">
@@ -244,7 +308,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section className=" section3 bg-background  relative h-[150vh] w-screen overflow-clip">
+          <section className=" section3 top-0 bg-background  sticky z-30 h-[150vh] w-screen overflow-clip">
             <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen  items-center">
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
                 <text className=" text-5xl text-white">
@@ -262,11 +326,11 @@ export default function Home() {
                 </button>
               </div>
               <div className="flex h-full w-2/3 items-center justify-center">
-                <div className="objet3 h-20 w-20 rounded-lg bg-black"></div>
+                
               </div>
             </div>
           </section>
-          <section className="section2 bg-background  relative h-[150vh] w-screen overflow-clip">
+          <section className="section2 top-0 bg-background  sticky z-40 h-[150vh] w-screen overflow-clip">
             <div className="bg-secondary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center p-10">
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">Os melhores do Mercado</text>
@@ -319,7 +383,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section className=" section3 bg-background  relative h-[150vh] w-screen overflow-clip">
+          <section className=" section3 top-0 bg-background  sticky z-50 h-[150vh] w-screen overflow-clip">
             <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen  items-center">
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
                 <text className=" text-5xl text-white">
@@ -369,7 +433,7 @@ export default function Home() {
           </section>
         </div>
       </main>
-      <section className="section2 bg-background  relative h-[50vh] w-screen overflow-clip">
+      <section className="section2 top-0 bg-background  relative h-[50vh] w-screen overflow-clip">
         <div className="bg-secondary_100 sticky top-0 z-0 flex h-[50vh] w-screen items-center">
           <div
             // ref={trackedElementRef}

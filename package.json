@@ -23,6 +23,7 @@
     "react-dom": "^18",
     "react-spline": "^1.2.1",
     "react-three": "^0.9.7",
+    "sass": "^1.70.0",
     "spline": "^0.0.0",
     "three": "^0.161.0"
   },
