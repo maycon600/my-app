@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useScroll, useTransform, motion, useAnimation } from "framer-motion";
 import Spline from "@splinetool/react-spline";
-import { useSpring } from "framer-motion"
+import { useSpring } from "framer-motion";
 import gsap from "gsap";
 import EarthCanvas from ".";
+import { AboutButton } from "@/components/aboutButton";
+import { DownloadButton, NewButton } from "@/components/newButton";
 const animationOrder = {
   initial: 0,
   fadeinPrimeiraSessao: 100 / 750, // Inicia um pouco antes da primeira sessão
@@ -99,51 +101,70 @@ export default function Home() {
       animationOrder1.cresce2,
       animationOrder1.chega3,
     ],
-    ["0%", "0%", "0%", "0%", "0%", "0%", "100%", "200%"],
+    ["0%", "0%", "0%", "0%", "0%", "0%", "100%", "160%"],
   );
 
   const rotate = useTransform(
     scrollYProgress,
     [animationOrder1.cresce, animationOrder1.chega2],
-    [2.6, 8.8]
+    [2.6, 8.8],
   );
-  const spring = useSpring(x)
+  const spring = useSpring(x);
 
   const [rotationY, setRotationY] = useState(2.6);
   const controls = useAnimation();
-  const [imagemSelecionada, setImagemSelecionada] = useState('image1');
-const calculateRotation = (scrollValue, image) => {
-  const segments = [
-    { start: animationOrder1.mantem1, end: animationOrder1.chega2, image: "image2" },
-    { start: animationOrder1.mantem2, end: animationOrder1.chega3, image: "image3" },
-    { start: animationOrder1.mantem3, end: animationOrder1.cresce3, image: "image4" },
-    { start: animationOrder1.cresce4, end: animationOrder1.chega5, image: "image5" },
-  ];
+  const [imagemSelecionada, setImagemSelecionada] = useState("image1");
+  const calculateRotation = (scrollValue, image) => {
+    const segments = [
+      {
+        start: animationOrder1.mantem1,
+        end: animationOrder1.chega2,
+        image: "image2",
+      },
+      {
+        start: animationOrder1.mantem2,
+        end: animationOrder1.chega3,
+        image: "image3",
+      },
+      {
+        start: animationOrder1.mantem3,
+        end: animationOrder1.cresce3,
+        image: "image4",
+      },
+      {
+        start: animationOrder1.cresce4,
+        end: animationOrder1.chega5,
+        image: "image5",
+      },
+    ];
 
-  // Verifica se o scrollValue está antes do primeiro segmento
-  if (scrollValue < segments[0].start) {
-    setImagemSelecionada("image1");
-    return rotationY; // Retorna o valor atual
-  }
-
-  for (let i = 0; i < segments.length; i++) {
-    const { start, end } = segments[i];
-    if (scrollValue >= start && scrollValue <= end) {
-      const progress = (scrollValue - start) / (end - start);
-      console.log("segmentIndex", i, ": Progresso:", progress);
-      setImagemSelecionada(segments[i].image); // Define a imagem com base no segmento
-      return 2.6 + progress * (8.8 - 2.6);
+    // Verifica se o scrollValue está antes do primeiro segmento
+    if (scrollValue < segments[0].start) {
+      setImagemSelecionada("image1");
+      return rotationY; // Retorna o valor atual
     }
-  }
 
-  return rotationY; // Retorna o valor atual
-};
+    for (let i = 0; i < segments.length; i++) {
+      const { start, end } = segments[i];
+      if (scrollValue >= start && scrollValue <= end) {
+        const progress = (scrollValue - start) / (end - start);
+        console.log("segmentIndex", i, ": Progresso:", progress);
+        setImagemSelecionada(segments[i].image); // Define a imagem com base no segmento
+        return 2.6 + progress * (8.8 - 2.6);
+      }
+    }
+
+    return rotationY; // Retorna o valor atual
+  };
   useEffect(() => {
     const updateRotation = (value) => {
       const targetRotation = calculateRotation(value);
       setRotationY(targetRotation);
 
-      controls.start({ rotateY: targetRotation, transition: { type: "tween", duration: 0.5 } });
+      controls.start({
+        rotateY: targetRotation,
+        transition: { type: "tween", duration: 0.5 },
+      });
     };
 
     const unsubscribe = scrollYProgress.onChange(updateRotation);
@@ -151,10 +172,9 @@ const calculateRotation = (scrollValue, image) => {
     return () => unsubscribe();
   }, [controls, scrollYProgress]);
 
-
   const mudarImagem = (novaImagem) => {
-      setImagemSelecionada(novaImagem);
-      console.log(novaImagem);
+    setImagemSelecionada(novaImagem);
+    console.log(novaImagem);
   };
   return (
     <>
@@ -188,12 +208,12 @@ const calculateRotation = (scrollValue, image) => {
 
       <main>
         <motion.div
-          className="sticky top-[20%] flex justify-start  items-start z-[60] h-[70vh] w-[20rem] pl-10 pr-5"
+          className="sticky top-[20%] z-[60] flex  h-[70vh] w-[20rem] items-start justify-start pl-10 pr-5"
           style={{ x }}
         >
           <div className="h-[70vh] w-[16rem]">
-          <EarthCanvas rotationY={rotationY} imagem={imagemSelecionada}/>
-          {/* <button className=" bg-white ml-2" onClick={()=> mudarImagem("image1")}>1</button>
+            <EarthCanvas rotationY={rotationY} imagem={imagemSelecionada} />
+            {/* <button className=" bg-white ml-2" onClick={()=> mudarImagem("image1")}>1</button>
           <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image2")}>2</button>
           <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image3")}>3</button>
           <button className=" bg-white ml-2"  onClick={()=> mudarImagem("image4")}>4</button>
@@ -201,16 +221,14 @@ const calculateRotation = (scrollValue, image) => {
           </div>
         </motion.div>
         <div ref={targetRef} className="">
-          <section className=" sticky top-0 section1 bg-background z-10 -mt-[70vh] h-[150vh] w-screen overflow-clip">
-            <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center">
+          <section className=" section1 bg-background sticky top-0 z-10 -mt-[70vh] h-[150vh] w-screen overflow-clip">
+            <div className="sticky top-0 z-0 flex h-[100vh] w-screen items-center bg-primary_100">
               {/* <div clas
               <button
                 className="ml-[30%] h-[100px] w-[100px]  bg-red-500"
                 onClick={() => setShouldAnimate(!shouldAnimate)}
               /> */}
-              <div className="flex h-full w-1/3 items-center justify-center">
-                
-              </div>
+              <div className="flex h-full w-1/3 items-center justify-center"></div>
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">Ver o soja</text>
                 <div className="flex  w-full flex-row items-center justify-between">
@@ -230,14 +248,12 @@ const calculateRotation = (scrollValue, image) => {
                 </div>
 
                 <div className="mt-10 flex w-full justify-evenly">
-                  <button className="w-36 rounded-2xl border-2 border-solid border-white bg-transparent p-2 text-white">
-                    {" "}
-                    Entender Melhor
+                  <button className="group relative mb-2 me-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900  group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 ">
+                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                      Entender Melhor
+                    </span>
                   </button>
-                  <button className="w-36 rounded-2xl border-2 border-none bg-[#25D366] p-2 ">
-                    {" "}
-                    Baixar o App
-                  </button>
+                  <DownloadButton />
                 </div>
               </div>
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
@@ -245,22 +261,20 @@ const calculateRotation = (scrollValue, image) => {
                   Preço da <br /> <span className=" text-[#25D366]">Soja</span>
                 </text>
                 <p className="mt-10 text-white">
-                  Texto texto texto texto Texto texto texto texto Texto texto
-                  texto texto Texto texto texto texto Texto texto texto
-                  textoTexto texto texto texto Texto texto texto textoTexto
-                  texto texto texto
+                  🌱 Mantenha-se sempre à frente no mercado agrícola! Com o
+                  'Agro na Mão', você tem acesso em tempo real às cotações
+                  atualizadas de soja, milho, algodão e muito mais. Faça
+                  escolhas informadas e maximize seus lucros com informações
+                  precisas e atualizadas. Baixe agora e transforme a maneira
+                  como você acompanha o mercado!
                 </p>
-                <button className="mt-10 self-start text-white">
-                  Saiba mais
-                </button>
+                <AboutButton />
               </div>
             </div>
           </section>
-          <section className="section2 top-0 bg-background  sticky z-20 h-[150vh] w-screen overflow-clip">
-            <div className="bg-secondary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center">
-              <div className="flex h-full w-1/3 items-center justify-center">
-                
-              </div>
+          <section className="section2 bg-background sticky  top-0 z-20 h-[150vh] w-screen overflow-clip">
+            <div className="sticky top-0 z-0 flex h-[100vh] w-screen items-center bg-secondary_100">
+              <div className="flex h-full w-1/3 items-center justify-center"></div>
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">
                   Ver o Preço da @ Boi (R$)
@@ -282,14 +296,12 @@ const calculateRotation = (scrollValue, image) => {
                 </div>
 
                 <div className="mt-10 flex w-full justify-evenly">
-                  <button className="w-36 rounded-2xl border-2 border-solid border-white bg-transparent p-2 text-white">
-                    {" "}
-                    Entender Melhor
+                  <button className="group relative mb-2 me-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900  group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 ">
+                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                      Entender Melhor
+                    </span>
                   </button>
-                  <button className="w-36 rounded-2xl border-2 border-none bg-[#25D366] p-2 ">
-                    {" "}
-                    Baixar o App
-                  </button>
+                  <DownloadButton />
                 </div>
               </div>
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
@@ -297,41 +309,38 @@ const calculateRotation = (scrollValue, image) => {
                   Preço do <br /> <span className=" text-[#25D366]">Boi</span>
                 </text>
                 <p className="mt-10 text-white ">
-                  Texto texto texto texto Texto texto texto texto Texto texto
-                  texto texto Texto texto texto texto Texto texto texto
-                  textoTexto texto texto texto Texto texto texto textoTexto
-                  texto texto texto
+                  O futuro da pecuária na palma da sua mão! Acompanhe as
+                  cotações atuais do boi e tome decisões estratégicas para seu
+                  negócio. Com o 'Agro na Mão', você tem acesso a dados
+                  confiáveis para negociar com confiança e eficiência. Não fique
+                  para trás, baixe o aplicativo e lidere o mercado!
                 </p>
-                <button className="mt-10 self-start text-white">
-                  Saiba mais
-                </button>
+                <AboutButton />
               </div>
             </div>
           </section>
-          <section className=" section3 top-0 bg-background  sticky z-30 h-[150vh] w-screen overflow-clip">
-            <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen  items-center">
+          <section className=" section3 bg-background sticky  top-0 z-30 h-[150vh] w-screen overflow-clip">
+            <div className="sticky top-0 z-0 flex h-[100vh] w-screen items-center  bg-primary_100">
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
                 <text className=" text-5xl text-white">
                   Propriedades <br />{" "}
                   <span className=" text-[#25D366]">Incríveis</span>
                 </text>
                 <p className="mt-10 text-white ">
-                  Texto texto texto texto Texto texto texto texto Texto texto
-                  texto texto Texto texto texto texto Texto texto texto
-                  textoTexto texto texto texto Texto texto texto textoTexto
-                  texto texto texto
+                  Descubra a fazenda dos seus sonhos! Explore um marketplace
+                  exclusivo de propriedades e itens agrícolas à venda. O 'Agro
+                  na Mão' conecta você às melhores oportunidades de investimento
+                  em terras e equipamentos. Seja para expandir, começar seu
+                  negócio, investir ou vender, encontre aqui. Baixe o app e
+                  comece sua jornada!
                 </p>
-                <button className="mt-10 self-start text-white">
-                  Saiba mais
-                </button>
+                <AboutButton />
               </div>
-              <div className="flex h-full w-2/3 items-center justify-center">
-                
-              </div>
+              <div className="flex h-full w-2/3 items-center justify-center"></div>
             </div>
           </section>
-          <section className="section2 top-0 bg-background  sticky z-40 h-[150vh] w-screen overflow-clip">
-            <div className="bg-secondary_100 sticky top-0 z-0 flex h-[100vh] w-screen items-center p-10">
+          <section className="section2 bg-background sticky  top-0 z-40 h-[150vh] w-screen overflow-clip">
+            <div className="sticky top-0 z-0 flex h-[100vh] w-screen items-center bg-secondary_100 p-10">
               <div className="item-center flex h-full w-1/3 flex-col justify-center">
                 <text className="mb-10 text-white">Os melhores do Mercado</text>
                 <div className="flex  w-full flex-row items-center justify-between">
@@ -354,14 +363,12 @@ const calculateRotation = (scrollValue, image) => {
                 </div>
 
                 <div className="mt-10 flex w-full justify-evenly">
-                  <button className="w-36 rounded-2xl border-2 border-solid border-white bg-transparent p-2 text-white">
-                    {" "}
-                    Entender Melhor
+                  <button className="group relative mb-2 me-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-transparent bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900  group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 ">
+                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                      Entender Melhor
+                    </span>
                   </button>
-                  <button className="w-36 rounded-2xl border-2 border-none bg-[#25D366] p-2 ">
-                    {" "}
-                    Baixar o App
-                  </button>
+                  <DownloadButton />
                 </div>
               </div>
               <div className="flex h-full w-1/3" />
@@ -372,32 +379,31 @@ const calculateRotation = (scrollValue, image) => {
                   <span className=" text-[#25D366]">Produtos do Agro</span>
                 </text>
                 <p className="mt-10 text-white ">
-                  Texto texto texto texto Texto texto texto texto Texto texto
-                  texto texto Texto texto texto texto Texto texto texto
-                  textoTexto texto texto texto Texto texto texto textoTexto
-                  texto texto texto
+                  🌾 Elevando a qualidade do seu trabalho no campo! Conheça os
+                  melhores produtos agrícolas, desde defensivos até vacinas para
+                  o gado. O 'Agro na Mão' traz recomendações personalizadas ara
+                  suas necessidades. Otimize suas colheitas e criações com
+                  produtos de ponta. Baixe o aplicativo e inove no seu agro!
                 </p>
-                <button className="mt-10 self-start text-white">
-                  Saiba mais
-                </button>
+                <AboutButton />
               </div>
             </div>
           </section>
-          <section className=" section3 top-0 bg-background  sticky z-50 h-[150vh] w-screen overflow-clip">
-            <div className="bg-primary_100 sticky top-0 z-0 flex h-[100vh] w-screen  items-center">
+          <section className=" section3 bg-background sticky  top-0 z-50 h-[150vh] w-screen overflow-clip">
+            <div className="sticky top-0 z-0 flex h-[100vh] w-screen items-center  bg-primary_100">
               <div className=" flex h-full w-1/3 flex-col justify-center  p-10">
                 <text className=" text-5xl text-white">
                   Esteja <span className=" text-[#25D366]">Ligado</span>
                 </text>
                 <p className="mt-10 text-white">
-                  Texto texto texto texto Texto texto texto texto Texto texto
-                  texto texto Texto texto texto texto Texto texto texto
-                  textoTexto texto texto texto Texto texto texto textoTexto
-                  texto texto texto
+                  Fique por dentro do mundo agropecuário! Com o 'Agro na Mão',
+                  você acessa as últimas notícias, tendências e inovações do
+                  setor. Seja o primeiro a saber sobre novas tecnologias,
+                  práticas sustentáveis e muito mais. Informação é poder, e com
+                  nosso app, ela está sempre ao seu alcance. Baixe agora e
+                  esteja sempre um passo à frente!
                 </p>
-                <button className="mt-10 self-start text-white">
-                  Saiba mais
-                </button>
+                <AboutButton />
               </div>
               <div className="flex h-full w-1/3" />
               <div className="item-center flex h-full w-1/3 flex-col justify-center pr-10">
@@ -419,22 +425,20 @@ const calculateRotation = (scrollValue, image) => {
                 </div>
 
                 <div className="mt-10 flex w-full justify-evenly">
-                  <button className="w-36 rounded-2xl border-2 border-solid border-white bg-transparent p-2 text-white">
-                    {" "}
-                    Entender Melhor
+                  <button className="group relative mb-2 me-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-transparent bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900  group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 ">
+                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                      Entender Melhor
+                    </span>
                   </button>
-                  <button className="w-36 rounded-2xl border-2 border-none bg-[#25D366] p-2 ">
-                    {" "}
-                    Baixar o App
-                  </button>
+                  <DownloadButton />
                 </div>
               </div>
             </div>
           </section>
         </div>
       </main>
-      <section className="section2 top-0 bg-background  relative h-[50vh] w-screen overflow-clip">
-        <div className="bg-secondary_100 sticky top-0 z-0 flex h-[50vh] w-screen items-center">
+      <section className="section2 bg-background relative  top-0 h-[50vh] w-screen overflow-clip">
+        <div className="sticky top-0 z-0 flex h-[50vh] w-screen items-center bg-secondary_100">
           <div
             // ref={trackedElementRef}
             className="flex h-full w-[25%] flex-col items-center justify-center"

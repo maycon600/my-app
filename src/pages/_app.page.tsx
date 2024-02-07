@@ -3,7 +3,7 @@ import "../styles/bootstrap.scss";
 import GlobalStyle from "@/styles/global";
 import { ThemeProvider } from "styled-components";
 import Theme from "@/styles/themes";
-import "@/styles/globals.css"
+import "@/styles/globals.css";
 
 function MyApp({ Component, pageProps }: any) {
   // useEffect(() => {
@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }: any) {
 
   return (
     <>
-        <Component {...pageProps} />
+      <Component {...pageProps} />
     </>
   );
 }

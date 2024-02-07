@@ -25,7 +25,8 @@
     "react-three": "^0.9.7",
     "sass": "^1.70.0",
     "spline": "^0.0.0",
-    "three": "^0.161.0"
+    "three": "^0.161.0",
+    "tw-elements": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
