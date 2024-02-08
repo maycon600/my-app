@@ -20,7 +20,6 @@ import ProductSection from "@/components/home/sections/productSection";
 import NewsSection from "@/components/home/sections/NewsSection";
 import Footer from "@/components/home/sections/footer";
 import PhoneModel from "../../components/home/sections/PhoneModel";
-import { ModelContextProvider, TextureContextProvider } from "@/components/home/sections/imageContext";
 const animationOrder = {
   initial: 0,
   fadeinPrimeiraSessao: 100 / 750, // Inicia um pouco antes da primeira sessão
@@ -245,8 +244,9 @@ export default function Home() {
           </div>
         </motion.div> */}
       <main>
-        <TextureContextProvider style={{backgroundColor: "black"}}>
+
         <PhoneModel/>
+        <div id="phone-model"></div>
         <div ref={targetRef} className="">
           <SoySection />
           <BullSection />
@@ -255,7 +255,6 @@ export default function Home() {
           <NewsSection  />
           <div id="battery"></div>
         </div>
-        </TextureContextProvider>
       </main>
       <Footer  />
     </>
