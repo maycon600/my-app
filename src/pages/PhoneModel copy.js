@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Canvas } from "@react-three/fiber";
 import { AdaptiveDpr, AdaptiveEvents, Environment } from "@react-three/drei";
-import Model from "../components/Scene";
+import Model from "../components/home/sections/Scene";
 import { Suspense } from "react";
 
 const Container = styled.div`

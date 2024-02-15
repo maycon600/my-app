@@ -4,7 +4,7 @@ import AnimatedTextCharacter from "@/pages/home/te";
 import MotionDivFromTop from "../motion/motionFromTop";
 import MotionDivFromBottom from "../motion/motionFromBottom";
 import MotionDivFromRight from "../motion/motionFromRight";
-
+import x from "../../../../public/1.jpeg"
 export default function NewsSection (){
     return (
         <section id="battery" className="section3 bg-background sticky  top-0 z-50 h-[150vh] w-screen overflow-clip">
